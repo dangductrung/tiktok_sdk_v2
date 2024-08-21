@@ -16,9 +16,9 @@ A new Flutter plugin project.
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
 
-  s.dependency 'TikTokOpenSDKCore', '~> 2.2.0'
-  s.dependency 'TikTokOpenAuthSDK', '~> 2.2.0'
-  s.dependency 'TikTokOpenShareSDK', '~> 2.2.0'
+  s.dependency 'TikTokOpenSDKCore', '~> 2.4.0'
+  s.dependency 'TikTokOpenAuthSDK', '~> 2.4.0'
+  s.dependency 'TikTokOpenShareSDK', '~> 2.4.0'
 
   s.platform = :ios, '11.0'
 
