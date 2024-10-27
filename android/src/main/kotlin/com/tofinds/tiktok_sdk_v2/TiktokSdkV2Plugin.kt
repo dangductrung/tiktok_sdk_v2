@@ -22,7 +22,7 @@ class TiktokSdkV2Plugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plugin
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
-  private  var authApi: AuthApi? = null
+  private var authApi: AuthApi? = null
 
   var activity: Activity? = null
   private var activityPluginBinding: ActivityPluginBinding? = null
@@ -36,6 +36,7 @@ class TiktokSdkV2Plugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plugin
   private var clientKey: String? = null
   private var codeVerifier: String = ""
   private var redirectUrl: String = ""
+  private var isCompleted: Boolean = false
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     println(call.method);
@@ -56,6 +57,7 @@ class TiktokSdkV2Plugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plugin
         result.success(null)
       }
       "login" -> {
+        isCompleted = false;
         val scope = call.argument<String>("scope")
         val state = call.argument<String>("state")
         redirectUrl = call.argument<String>("redirectUri") ?: ""
@@ -71,7 +73,7 @@ class TiktokSdkV2Plugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plugin
           state = state,
           codeVerifier = codeVerifier,
         )
-        val authType = if (browserAuthEnabled == true) {
+       val authType = if (browserAuthEnabled == true) {
          AuthApi.AuthMethod.ChromeTab
         } else {
          AuthApi.AuthMethod.TikTokApp
@@ -125,14 +127,22 @@ class TiktokSdkV2Plugin: FlutterPlugin, MethodCallHandler, ActivityAware, Plugin
           "grantedPermissions" to it.grantedPermissions,
           "codeVerifier" to codeVerifier
         )
-        loginResult?.success(resultMap)
+        if (!isCompleted) {
+          loginResult?.success(resultMap)
+          isCompleted = true
+        }
+        Unit
       } else {
         // Returns an error if authentication fails
-        loginResult?.error(
-          it.errorCode.toString(),
-          it.errorMsg,
-          null,
-        )
+        if (!isCompleted) {
+          loginResult?.error(
+            it.errorCode.toString(),
+            it.errorMsg,
+            null,
+          )
+          isCompleted = true
+        }
+        Unit
       }
     }
     return true
